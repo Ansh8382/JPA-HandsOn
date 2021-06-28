@@ -1,79 +1,75 @@
 package com.cognizant.springlearn;
-import com.cognizant.springlearn.model.Country;
-import com.cognizant.springlearn.service.CountryNotFoundException;
-import com.cognizant.springlearn.service.CountryService;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.cognizant.springlearn.entity.Country;
 
 @SpringBootApplication
 public class SpringLearnApplication {
-
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpringLearnApplication.class);
-	private static CountryService countryService;
 
 	public static void main(String[] args) {
-		ApplicationContext context = SpringApplication.run(SpringLearnApplication.class, args);
-		countryService = context.getBean(CountryService.class);
+		SpringApplication.run(SpringLearnApplication.class, args);
 		LOGGER.info("Inside main");
-		getAllCountriesTest();
-		testAddCountry();
-		testUpdateCountry();
-		testDeleteCountry();
+		displayDate();
+		displayCountry();
+		displayCountries();
 	}
 
-	private static void getAllCountriesTest() {
-		LOGGER.info("Start");
-		Country country;
+	public static void displayDate() {
+		LOGGER.info("START");
+		ApplicationContext context = new ClassPathXmlApplicationContext("date-format.xml");
+		SimpleDateFormat format = context.getBean("dateFormat", SimpleDateFormat.class);
 		try {
-			country = countryService.findCountryByCode("GF");
-			LOGGER.debug("Country:{}", country);
-			LOGGER.info("End");
-		} catch (CountryNotFoundException e) {
+			Date date = format.parse("31/12/2018");
+			LOGGER.debug(format.format(date));
+		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+		LOGGER.info("END");
 	}
 	
-	private static void testAddCountry() {
-		Country country = new Country();
-		country.setCode("IN");
-		country.setName("India");
-		countryService.addCountry(country);
-		
-		Country country_check;
-		try {
-			country_check = countryService.findCountryByCode("IN");
-			LOGGER.debug("Country:{}", country_check);
-			LOGGER.info("End");
-		} catch (CountryNotFoundException e) {
-			e.printStackTrace();
-		}
+	private static void displayCountry() {
+		LOGGER.info("START");
+		ApplicationContext context = new ClassPathXmlApplicationContext("country.xml");
+
+		Country country = context.getBean("in", Country.class);
+
+		LOGGER.debug("Country : {}", country);
+		LOGGER.info("END");
 	}
 	
-	private static void testUpdateCountry() {
-		countryService.updateCountry("IN", "INDONESIA");
-		Country country_check;
-		try {
-			country_check = countryService.findCountryByCode("IN");
-			LOGGER.debug("Country:{}", country_check);
-			LOGGER.info("End");
-		} catch (CountryNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private static void testDeleteCountry() {
-		countryService.deleteCountry("IN");
-		Country country_check;
-		try {
-			country_check = countryService.findCountryByCode("IN");
-			LOGGER.debug("Country:{}", country_check);
-			LOGGER.info("End");
-		} catch (CountryNotFoundException e) {
-			System.out.println("Country deleted successfully");
-		}
+	public static void displayCountries() {
+		LOGGER.info("START");
+		ApplicationContext context = new ClassPathXmlApplicationContext("country.xml");
+
+		List<Country> countryList = context.getBean("countryList", ArrayList.class);
+
+		LOGGER.debug("CountryList : {}", countryList);
+		LOGGER.info("END");
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
